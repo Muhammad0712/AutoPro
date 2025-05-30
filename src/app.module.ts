@@ -6,6 +6,7 @@ import { User } from "./users/models/user.model";
 import { AdminsModule } from "./admins/admins.module";
 import { Admin } from "./admins/models/admin.model";
 import { AuthModule } from './auth/auth.module';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     AdminsModule,
     AuthModule,
+    CompaniesModule,
   ],
   controllers: [],
   providers: [],

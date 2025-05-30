@@ -43,7 +43,7 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, email } = updateUserDto;
     const user = await this.findByEmail(email!);
-    if (user) {
+    if (user && user.id != id) {
       throw new BadRequestException("Bunday emailli foydalanuvchi mavjud");
     }
     const hashedPassword = await bcrypt.hash(password!, 7);

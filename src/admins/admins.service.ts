@@ -8,14 +8,13 @@ import { UpdateAdminDto } from "./dto/update-admin.dto";
 import { InjectModel } from "@nestjs/sequelize";
 import { Admin } from "./models/admin.model";
 import * as bcrypt from "bcrypt";
-
 @Injectable()
 export class AdminsService {
   constructor(@InjectModel(Admin) private readonly adminModel: typeof Admin) {}
   async create(createAdminDto: CreateAdminDto) {
-    const user = await this.findByEmail(createAdminDto.email);
-    if (user) {
-      throw new BadRequestException("Bunday foydalanuvchi mavjud!");
+    const admin = await this.findByEmail(createAdminDto.email);
+    if (admin) {
+      throw new BadRequestException("Bunday admin mavjud!");
     }
     const hashedPassword = await bcrypt.hash(createAdminDto.password, 7);
     return this.adminModel.create({
@@ -45,8 +44,10 @@ export class AdminsService {
   async update(id: number, updateAdminDto: UpdateAdminDto) {
     const { password, email } = updateAdminDto;
     const admin = await this.findByEmail(email!);
-    if (admin) {
-      throw new BadRequestException("Bunday emailli admin mavjud");
+    if (admin && admin.id != id) {
+      throw new BadRequestException(
+        "Bunday email tarmoqda mavjud"
+      );
     }
     const hashedPassword = await bcrypt.hash(password!, 7);
     const updatedAdmin = await this.adminModel.update(
@@ -62,12 +63,28 @@ export class AdminsService {
   async remove(id: number) {
     const admin = await this.adminModel.findByPk(id);
     if (!admin) {
-      throw new NotFoundException("Bunday admin mavjud emas") 
+      throw new NotFoundException("Bunday admin mavjud emas");
     }
     await this.adminModel.destroy({ where: { id } });
     return {
       id: id,
       message: "Admin deleted succesfully!",
+    };
+  }
+
+  async activateAdmin(id: number, is_active: boolean) {
+    const admin = await this.adminModel.findByPk(id);
+    if (!admin) {
+      throw new BadRequestException("Admin not found!");
+    }
+    await this.adminModel.update({ is_active }, { where: { id } });
+    if (is_active) {
+      return {
+        message: "Admin activated succesfully!",
+      };
+    } 
+    return {
+      message: "Admin has been deactivated!!",
     };
   }
 

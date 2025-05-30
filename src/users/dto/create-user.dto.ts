@@ -2,7 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsPhoneNumber, Matches } from "class-validator";
 
 export class CreateUserDto {
-  @ApiProperty({ example: "Muhammad", description: "Foydalanuvchining ismi" })
+  @ApiProperty({
+    example: "Muhammad",
+    description: "Foydalanuvchining ismi",
+  })
   @IsNotEmpty({ message: "Iltimos ismingizni kiriting" })
   first_name: string;
 

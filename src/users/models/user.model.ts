@@ -65,6 +65,7 @@ export class User extends Model<User, IUserCreationAttr> {
   })
   @Column({
     type: DataType.STRING,
+    unique: true
   })
   declare phone_number: string;
 
@@ -84,7 +85,7 @@ export class User extends Model<User, IUserCreationAttr> {
   })
   @Column({
     type: DataType.STRING,
-    defaultValue: "",
+    defaultValue: DataType.UUIDV4,
   })
   declare activation_link: string;
 

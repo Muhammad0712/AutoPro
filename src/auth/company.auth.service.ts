@@ -6,29 +6,29 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { User } from "../users/models/user.model";
 import { SignInDto } from "./dto/sign-in.dto";
 import { Response } from "express";
-import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
-import { CreateUserDto } from "../users/dto/create-user.dto";
 import { MailService } from "../mail/mail.service";
 import { InjectModel } from "@nestjs/sequelize";
+import { Company } from "../companies/models/company.model";
+import { CompaniesService } from "../companies/companies.service";
+import { CreateCompanyDto } from "../companies/dto/create-company.dto";
 
 @Injectable()
-export class UserAuthService {
+export class CompanyAuthService {
   constructor(
-    @InjectModel(User) private readonly userModel: typeof User,
+    @InjectModel(Company) private readonly companyModel: typeof Company,
     private readonly jwtService: JwtService,
-    private readonly userService: UsersService,
+    private readonly companiesService: CompaniesService,
     private readonly mailService: MailService
   ) {}
 
-  async generateTokens(user: User) {
+  async generateTokens(company: Company) {
     const payload = {
-      id: user.id,
-      email: user.email,
-      role: "user",
+      id: company.id,
+      email: company.email,
+      role: "company",
     };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -46,19 +46,19 @@ export class UserAuthService {
     };
   }
 
-  async signUp(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
-    const user = await this.userService.findByEmail(email);
-    if (user) {
+  async signUp(createCompanyDto: CreateCompanyDto) {
+    const { email, password } = createCompanyDto;
+    const company = await this.companiesService.findByEmail(email);
+    if (company) {
       throw new BadRequestException("Bunday email oldin ro'yxatdan o'tgan!");
     }
     const hashedPassword = await bcrypt.hash(password, 7);
-    const newUser = await this.userModel.create({
-      ...createUserDto,
+    const newCompany = await this.companyModel.create({
+      ...createCompanyDto,
       password: hashedPassword,
     });
     try {
-      await this.mailService.sendMailUser(newUser);
+      await this.mailService.sendMailCompany(newCompany);
     } catch (error) {
       console.log(error);
       throw new ServiceUnavailableException("Emailga xat yuborishda xatolik");
@@ -69,29 +69,29 @@ export class UserAuthService {
   }
 
   async signIn(signInDto: SignInDto, res: Response) {
-    const user = await this.userService.findByEmail(signInDto.email);
-    if (!user) {
+    const company = await this.companiesService.findByEmail(signInDto.email);
+    if (!company) {
       throw new NotFoundException("Email yoki parol noto'g'ri!1");
     }
-    if (!user.is_active) {
-      await this.mailService.sendMailUser(user);
+    if (!company.is_active) {
+      await this.mailService.sendMailCompany(company);
       throw new BadRequestException("Emailingizga link yuborildi! Tasdiqlab qayta urinib ko'ring!")
     }
     const isValidPassword = await bcrypt.compare(
       signInDto.password,
-      user.password
+      company.password
     );
     if (!isValidPassword) {
       throw new BadRequestException("Email yoki parol noto'g'ri!2");
     }
 
-    const { accessToken, refreshToken } = await this.generateTokens(user);
+    const { accessToken, refreshToken } = await this.generateTokens(company);
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       maxAge: Number(process.env.COOKIE_TIME),
     });
-    user.refresh_token = await bcrypt.hash(refreshToken, 7);
-    await user.save();
+    company.refresh_token = await bcrypt.hash(refreshToken, 7);
+    await company.save();
     return {
       message: "Tizimga xush kelibsiz!",
       accessToken,
@@ -99,21 +99,21 @@ export class UserAuthService {
   }
 
   async signOut(refreshToken: string, res: Response) {
-    const userData = await this.jwtService.verify(refreshToken, {
+    const companyData = await this.jwtService.verify(refreshToken, {
       secret: process.env.REFRESH_TOKEN_KEY,
     });
-    if (!userData) {
-      throw new ForbiddenException("User not verified!");
+    if (!companyData) {
+      throw new ForbiddenException("Company not verified!");
     }
-    const user = await this.userService.findByEmail(userData.email);
-    if (!user) {
+    const company = await this.companiesService.findByEmail(companyData.email);
+    if (!company) {
       throw new BadRequestException("Noto'g'ri token!");
     }
-    user.refresh_token = "";
-    await user.save();
+    company.refresh_token = "";
+    await company.save();
     res.clearCookie("refresh_token");
     return {
-      message: "User logged out succesfully!",
+      message: "Company logged out succesfully!",
     };
   }
 
@@ -122,13 +122,13 @@ export class UserAuthService {
     if (id !== decodedToken["id"]) {
       throw new ForbiddenException("Ruxsat etilmagan!");
     }
-    const user = await this.userModel.findByPk(id);
-    if (!user && !user!.refresh_token) {
-      throw new NotFoundException("User not found");
+    const company = await this.companyModel.findByPk(id);
+    if (!company && !company!.refresh_token) {
+      throw new NotFoundException("Company not found");
     }
-    const { accessToken, refreshToken } = await this.generateTokens(user!);
-    user!.refresh_token = refreshToken;
-    await user!.save();
+    const { accessToken, refreshToken } = await this.generateTokens(company!);
+    company!.refresh_token = refreshToken;
+    await company!.save();
 
     res.cookie("refresh_token", refreshToken, {
       maxAge: Number(process.env.COOKIE_TIME),
@@ -136,27 +136,25 @@ export class UserAuthService {
     });
 
     return {
-      message: "User refreshed",
-      userId: user!.id,
+      message: "Company refreshed succesfully",
+      companyId: company!.id,
       access_token: accessToken,
     };
   }
 
-  async activateUser(link: string) {
-    console.log(link);
+  async activateCompany(link: string) {
     if (!link) {
       throw new BadRequestException("Activation link not found!");
     }
-    const affectedCount = await this.userModel.update(
+    const affectedCount = await this.companyModel.update(
       { is_active: true },
       { where: { activation_link: link } }
     );
-    console.log(affectedCount);
     if (affectedCount[0] === 0) {
-      throw new BadRequestException("User not found!");
+      throw new BadRequestException("Company not found!");
     }
     return {
-      message: "User activated succesfully!",
+      message: "Company activated succesfully!",
     };
   }
 }

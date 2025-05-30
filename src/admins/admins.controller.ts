@@ -71,4 +71,10 @@ export class AdminsController {
   remove(@Param("id") id: string) {
     return this.adminsService.remove(+id);
   }
+
+  //___________________-ACTIVATE-ADMIN-___________________
+  @Patch(":id")
+  activateAdmin(@Param("id") id: string, @Body() is_active: boolean) {
+    
+  }
 }

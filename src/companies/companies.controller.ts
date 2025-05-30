@@ -1,0 +1,127 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { CompaniesService } from './companies.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Company } from './models/company.model';
+
+@Controller("companies")
+export class CompaniesController {
+  constructor(private readonly companiesService: CompaniesService) {}
+
+  //____________________-CREATE-COMPANY-____________________
+  @ApiOperation({
+    summary: "Yangi companiya qo'shish",
+    description: "Bu endpoint orqali yangi companiya qo'shiladi!",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Yangi companiya qo'shildi",
+    type: CreateCompanyDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      "Companiya qo'shishda xatolik yoki tarmoqda bunday foydalanuvchi mavjud!",
+  })
+  @HttpCode(201)
+  @Post()
+  create(@Body() createCompanyDto: CreateCompanyDto) {
+    return this.companiesService.create(createCompanyDto);
+  }
+
+  //____________________-FINDALL-COMPANIES-____________________
+  @ApiOperation({
+    summary: "Barcha kompaniyalar ro'yxatini chiqarish",
+    description: "Bu endpoint orqali companiyalar ro'yxati chiqariladi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Barcha kompaniyalar ro'yxati",
+    type: [Company],
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Companiyalar ro'yxatini chiqarishda xatolik!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Hech qanday companiya topilmadi",
+  })
+  @HttpCode(200)
+  @Get()
+  findAll() {
+    return this.companiesService.findAll();
+  }
+
+  //____________________-FINDONE-COMPANY-____________________
+  @ApiOperation({
+    summary: "Id orqali kompaniyani chiqarish",
+    description: "Bu endpoint id orqali companiya malumotlari chiqaradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Id orqali topilgan kompaniya",
+    type: Company,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Kompaniyani chiqarishda xatolik!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bunday kompaniya mavjud emas",
+  })
+  @HttpCode(200)
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.companiesService.findOne(+id);
+  }
+
+  //____________________-UPDATE-COMPANY-____________________
+  @ApiOperation({
+    summary: "Id orqali kompaniya malumotlarini o'zgartirish",
+    description: "Bu endpoint id orqali companiya malumotlari o'zgartiradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Kompaniya malumotlari muvaffaqiyatli o'zgartirildi",
+    type: UpdateCompanyDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Kompaniyani o'zgartirishda xatolik!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bunday kompaniya mavjud emas",
+  })
+  @HttpCode(200)
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
+    return this.companiesService.update(+id, updateCompanyDto);
+  }
+
+  //____________________-FINDONE-COMPANY-____________________
+  @ApiOperation({
+    summary: "Id orqali kompaniyani o'chirish",
+    description: "Bu endpoint id orqali companiya malumotlari o'chiradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Kompaniya muvaffaqiyatli o'chirildi",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Kompaniyani o'chirishda xatolik!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bunday kompaniya mavjud emas",
+  })
+  @HttpCode(200)
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.companiesService.remove(+id);
+  }
+}

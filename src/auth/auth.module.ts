@@ -9,16 +9,21 @@ import { ConfigModule } from "@nestjs/config";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../users/models/user.model";
 import { Admin } from "../admins/models/admin.model";
+import { AdminAuthService } from "./admin.auth.service";
+import { CompanyAuthService } from "./company.auth.service";
+import { Company } from "../companies/models/company.model";
+import { CompaniesModule } from "../companies/companies.module";
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([User, Admin]),
+    SequelizeModule.forFeature([User, Admin, Company]),
     JwtModule.register({ global: true }),
     UsersModule,
     AdminsModule,
     MailModule,
+    CompaniesModule
   ],
   controllers: [AuthController],
-  providers: [UserAuthService],
+  providers: [UserAuthService, AdminAuthService, CompanyAuthService],
 })
 export class AuthModule {}

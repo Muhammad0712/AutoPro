@@ -18,7 +18,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // ___________________-CREATE-USER-___________________
-  @ApiOperation({ summary: "Yangi foydalanuvchi qo'sish" })
+  @ApiOperation({ summary: "Yangi foydalanuvchi qo'shish" })
   @ApiResponse({ status: 201, type: CreateUserDto })
   @Post()
   create(@Body() createUserDto: CreateUserDto) {

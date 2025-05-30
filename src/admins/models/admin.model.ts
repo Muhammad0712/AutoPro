@@ -46,6 +46,7 @@ export class Admin extends Model<Admin, IAdminCreationAttr> {
   })
   @Column({
     type: DataType.STRING,
+    unique: true
   })
   declare email: string;
 
@@ -78,16 +79,6 @@ export class Admin extends Model<Admin, IAdminCreationAttr> {
     defaultValue: true,
   })
   declare is_active: boolean;
-
-  @ApiProperty({
-    example: "Activate",
-    description: "Bu yerga admin aktivatsiya linki kiritiladi",
-  })
-  @Column({
-    type: DataType.STRING,
-    defaultValue: "",
-  })
-  declare activation_link: string;
 
   @ApiProperty({
     example: "qwerty",
