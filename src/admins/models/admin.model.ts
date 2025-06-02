@@ -6,7 +6,6 @@ interface IAdminCreationAttr {
   last_name: string;
   email: string;
   password: string;
-  is_creator: boolean;
 }
 
 @Table({ tableName: "admins", timestamps: false })

@@ -12,27 +12,26 @@ import { MailService } from "../mail/mail.service";
 import { InjectModel } from "@nestjs/sequelize";
 import { Admin } from "../admins/models/admin.model";
 import { AdminsService } from "../admins/admins.service";
+import { CreatorsEmails } from "../app.constants";
 
 @Injectable()
 export class AdminAuthService {
   constructor(
     @InjectModel(Admin) private readonly adminModel: typeof Admin,
     private readonly jwtService: JwtService,
-    private readonly adminService: AdminsService,
-    private readonly mailService: MailService
+    private readonly adminService: AdminsService
   ) {}
 
   async generateTokens(admin: Admin) {
-    let role = "";
-    if (admin.is_creator) {
-      role = "superadmin"
-    } else {
-      role = "admin";
-    }
+    const isSuperAdmin = Object.values(CreatorsEmails).includes(admin.email);
+    admin.is_creator = isSuperAdmin;
+    await admin.save();
+    const role = isSuperAdmin ? "superadmin" : "admin";
+
     const payload = {
       id: admin.id,
       email: admin.email,
-      role: role
+      role: role,
     };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -56,7 +55,9 @@ export class AdminAuthService {
       throw new NotFoundException("Email yoki parol noto'g'ri!1");
     }
     if (!admin.is_active) {
-      throw new BadRequestException("Emailingizga link yuborildi! Tasdiqlab qayta urinib ko'ring!")
+      throw new BadRequestException(
+        "Emailingizga link yuborildi! Tasdiqlab qayta urinib ko'ring!"
+      );
     }
     const isValidPassword = await bcrypt.compare(
       signInDto.password,
@@ -95,6 +96,7 @@ export class AdminAuthService {
     res.clearCookie("refresh_token");
     return {
       message: "Admin logged out succesfully!",
+      id: adminData.id
     };
   }
 
@@ -108,7 +110,7 @@ export class AdminAuthService {
       throw new NotFoundException("Admin not found");
     }
     const { accessToken, refreshToken } = await this.generateTokens(admin!);
-    admin!.refresh_token = refreshToken;
+    admin!.refresh_token = await bcrypt.hash(refreshToken, 7);
     await admin!.save();
 
     res.cookie("refresh_token", refreshToken, {

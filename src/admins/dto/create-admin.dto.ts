@@ -36,10 +36,4 @@ export class CreateAdminDto {
   })
   password: string;
 
-  @ApiProperty({
-    example: true,
-    description:
-      "Bu yerga admin roli kiritiladi. Super bo'lsa true, admin bo'lsa false",
-  })
-  is_creator: boolean;
 }

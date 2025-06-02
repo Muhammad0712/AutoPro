@@ -217,7 +217,7 @@ export class AuthController {
     return this.adminAuthService.signOut(refreshToken, res);
   }
 
-  //____________________-REFRESH-USER-____________________
+  //____________________-REFRESH-ADMIN-____________________
   @ApiOperation({
     summary: "Admin refresh tokenini yangilash",
     description:

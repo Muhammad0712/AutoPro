@@ -6,12 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "./models/user.model";
+import { Roles } from "../common/decorators/roles-auth.decorator";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
+import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
 
 @Controller("users")
 export class UsersController {
@@ -19,7 +24,13 @@ export class UsersController {
 
   // ___________________-CREATE-USER-___________________
   @ApiOperation({ summary: "Yangi foydalanuvchi qo'shish" })
-  @ApiResponse({ status: 201, type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: "Foydalanuvchi muvaffaqiyatli qo'shildi",
+    type: CreateUserDto,
+  })
+  @Roles("superadmin", "admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -40,6 +51,8 @@ export class UsersController {
     status: 400,
     description: "So‘rovni bajarishda xatolik yuz berdi.",
   })
+  @Roles("superadmin", "admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -47,8 +60,8 @@ export class UsersController {
 
   // ___________________-FINDONE-USER-___________________
   @ApiOperation({
-    summary: "1ta foydalanuvchini olish",
-    description: "Bu endpoint 1ta foydalanuvchini olish uchun ishlatiladi.",
+    summary: "Foydalanuvchini id orqali o'z malumotlarini chiqarish",
+    description: "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
   })
   @ApiResponse({
     status: 200,
@@ -59,6 +72,8 @@ export class UsersController {
     status: 400,
     description: "So‘rovni bajarishda xatolik yuz berdi.",
   })
+  @Roles("superadmin", "admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id);
@@ -78,6 +93,8 @@ export class UsersController {
     status: 400,
     description: "So‘rovni bajarishda xatolik yuz berdi.",
   })
+  @Roles("superadmin", "admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
@@ -96,8 +113,72 @@ export class UsersController {
     status: 400,
     description: "So‘rovni bajarishda xatolik yuz berdi.",
   })
+  @Roles("superadmin", "admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
+    return this.usersService.remove(+id);
+  }
+
+  // ___________________-FINDONE-ONE-SELF-___________________
+  @ApiOperation({
+    summary: "Foydalanuvchi o'z malumotlarini chiqarishi",
+    description: "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Foydalanuvchi muvaffaqiyatli qaytarildi.",
+    type: User,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "So‘rovni bajarishda xatolik yuz berdi.",
+  })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard, JwtSelfGuard)
+  @Get("my-self/:id")
+  seeOneSelf(@Param("my-self/:id") id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  // ___________________-UPDATE-ONE-SELF-___________________
+  @ApiOperation({
+    summary: "Foydalanuvchi o'z malumotlarini o'zgartirishi",
+    description: "Bu endpoint orqali foydalanuvchi o'z malumotlarini o'zgartirish uchun ishlatiladi.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Foydalanuvchi malumotlaringiz muvaffaqiyatli o'zgartirildi.",
+    type: UpdateUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "So‘rovni bajarishda xatolik yuz berdi.",
+  })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard, JwtSelfGuard)
+  @Patch("my-self/:id")
+  changeOneSelf(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  // ___________________-DELETE-ONE-SELF-___________________
+  @ApiOperation({
+    summary: "Foydalanuvchi o'z malumotlarini o'chirishi",
+    description: "Bu endpoint foydalanuvchini o'chirish uchun ishlatiladi.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Foydalanuvchi malumotlari muvaffaqiyatli o'chirildi.",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "So‘rovni bajarishda xatolik yuz berdi.",
+  })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Delete("my-self/:id")
+  deleteOneSelf(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }
 }

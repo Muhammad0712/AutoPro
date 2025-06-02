@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { Contract } from "../../contracts/models/contract.model";
 
 interface IUserCreationAttr {
   first_name: string;
@@ -98,4 +99,7 @@ export class User extends Model<User, IUserCreationAttr> {
     defaultValue: "",
   })
   declare refresh_token: string;
+
+  @HasMany(()=> Contract)
+  contracts: Contract[];
 }

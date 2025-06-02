@@ -112,8 +112,9 @@ export class UserAuthService {
     user.refresh_token = "";
     await user.save();
     res.clearCookie("refresh_token");
-    return {
+    return {  
       message: "User logged out succesfully!",
+      id: userData.id
     };
   }
 

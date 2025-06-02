@@ -1,5 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { Region } from "../../regions/models/region.model";
+import { Car } from "../../cars/models/car.model";
+import { Contract } from "../../contracts/models/contract.model";
 
 interface ICompanyCreationAttr {
   company_name: string;
@@ -147,8 +150,18 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     example: "Toshkent",
     description: "Bu yerga companiya qaysi viloyatdaligi kiritiladi!",
   })
+  @ForeignKey(()=> Region)
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
   })
   declare region_id: number;
+
+  @BelongsTo(()=> Region)
+  region: Region;
+
+  @HasMany(()=> Car)
+  cars: Car[];
+
+  @HasMany(()=> Contract)
+  contracts: Contract[];
 }

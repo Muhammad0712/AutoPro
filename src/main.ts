@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { InternalServerErrorException, ValidationPipe } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
 
 async function start() {
@@ -14,10 +14,10 @@ async function start() {
     app.use(cookieParser());
 
     const config = new DocumentBuilder()
-      .setTitle("Skidkachi project")
+      .setTitle("AutPro project")
       .setDescription("NestJs Api")
       .setVersion("1.0")
-      .addTag("Swagger, Validation, Send email, Bot, Tokens")
+      .addTag("Swagger, Validation, Identiphication, Authentiphication, Authorization, ErrorHandling")
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, config);
@@ -28,6 +28,7 @@ async function start() {
     });
   } catch (error) {
     console.log(error);
+    throw new InternalServerErrorException("Something went wrong");
   }
 }
 start();
