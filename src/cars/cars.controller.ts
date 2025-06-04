@@ -17,7 +17,6 @@ import { Roles } from "../common/decorators/roles-auth.decorator";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 
-
 @Controller("cars")
 export class CarsController {
   constructor(private readonly carsService: CarsService) {}
@@ -53,7 +52,7 @@ export class CarsController {
   })
   @ApiResponse({
     status: 404,
-    description: "Hech qanday avtomobil topilmadi!"
+    description: "Hech qanday avtomobil topilmadi!",
   })
   @Get()
   findAll() {
@@ -115,5 +114,28 @@ export class CarsController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.carsService.remove(+id);
+  }
+
+  @ApiOperation({
+    summary: "O'ziga tegishli bo'lgan avtomobillarni chiqarish",
+    description:
+      "Bu endpoint orqali kompaniya xodimlari o'z kompaniyasiga tegishli bo'lgan avtomobillar ro'yxtini chiqaradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Companiyaga tegishli moshinalar muvaffaqiyatli qaytarildi!",
+    type: [Car]
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Companiyaga tegishli moshinalarni chiqarishda xatolik!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Hech qanday avtomobil topilmadi"
+  })
+  @Get("company-cars/:id")
+  getCompanyCars(@Param("id") id: string) {
+    return this.carsService.getCompanyCars(+id);
   }
 }

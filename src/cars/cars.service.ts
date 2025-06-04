@@ -78,4 +78,16 @@ export class CarsService {
 
     return { message: "Avtomobil muvaffaqiyatli o'chirildi!" };
   }
+
+  async getCompanyCars(id: number) {
+    const cars = await this.carModel.findAll({
+      where: {
+        company_id: id,
+      },
+    });
+    if (!cars.length) {
+      throw new NotFoundException("Hech qanday avtomobil topilmadi!");
+    }
+    return cars;
+  }
 }

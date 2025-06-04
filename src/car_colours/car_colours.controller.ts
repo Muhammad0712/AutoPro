@@ -118,5 +118,14 @@ export class CarColoursController {
   remove(@Param("id") id: string) {
     return this.carColoursService.remove(+id);
   }
+
+  @ApiOperation({
+    summary: "Mavjud avtomobil va ranglarini chiqarish!",
+    description: "Bu yerda avtomobil id raqami orqali nechta rangi mavjudligi aniqlanadi"
+  })
+  @Get("my-cars/:id")
+  getCompanyCarColors(@Param("id") id: string) {
+    return this.carColoursService.getCompanyCarColours(+id)
+  }
 }
   

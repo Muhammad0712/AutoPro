@@ -7,6 +7,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { CreateCarColourDto } from "./dto/create-car_colour.dto";
 import { CarColour } from "./models/car_colour.model";
 import { UpdateCarColourDto } from "./dto/update-car_colour.dto";
+import { Car } from "../cars/models/car.model";
 
 @Injectable()
 export class CarColoursService {
@@ -22,7 +23,9 @@ export class CarColoursService {
       },
     });
     if (existing) {
-      throw new ConflictException("Ushbu bog‘lanish allaqachon mavjud");
+      throw new ConflictException(
+        "Ushbu avtomobilni bunday rangi allaqachon mavjud"
+      );
     }
     return this.carColoursModel.create(createCarColourdto);
   }
@@ -30,7 +33,7 @@ export class CarColoursService {
   async findAll() {
     const records = await this.carColoursModel.findAll();
     if (!records.length) {
-      throw new NotFoundException("Hech qanday bog‘lanish topilmadi");
+      throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas");
     }
     return records;
   }
@@ -38,7 +41,7 @@ export class CarColoursService {
   async findOne(id: number) {
     const record = await this.carColoursModel.findByPk(id);
     if (!record) {
-      throw new NotFoundException("Bunday bog‘lanish topilmadi");
+      throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas");
     }
     return record;
   }
@@ -46,7 +49,7 @@ export class CarColoursService {
   async update(id: number, updateCarColourDto: UpdateCarColourDto) {
     const record = await this.carColoursModel.findByPk(id);
     if (!record) {
-      throw new NotFoundException("Bunday bog‘lanish topilmadi");
+      throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas");
     }
 
     const conflict = await this.carColoursModel.findOne({
@@ -67,9 +70,24 @@ export class CarColoursService {
   async remove(id: number) {
     const record = await this.carColoursModel.findByPk(id);
     if (!record) {
-      throw new NotFoundException("Bunday bog‘lanish topilmadi");
+      throw new NotFoundException("Bu avtomobilni bunday rangi topilmadi");
     }
     await this.carColoursModel.destroy({ where: { id } });
     return { message: "Bog‘lanish muvaffaqiyatli o‘chirildi" };
+  }
+
+  async getCompanyCarColours(id: number) {
+    const carColour = await this.carColoursModel.findAll({
+      where: {
+        car_id: id,
+      },
+      include: {
+        all: true,
+      },
+    });
+    if (!carColour.length) {
+      throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas!");
+    }
+    return carColour;
   }
 }

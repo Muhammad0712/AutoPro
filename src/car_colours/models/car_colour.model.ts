@@ -6,7 +6,6 @@ import { Car } from "../../cars/models/car.model";
 interface ICarColourCreationAttr {
   car_id: number;
   colour_id: number;
-  count: number;
 }
 
 @Table({ tableName: "car_colours", timestamps: false })
@@ -41,16 +40,6 @@ export class CarColour extends Model<CarColour, ICarColourCreationAttr> {
     type: DataType.INTEGER,
   })
   declare colour_id: number;
-
-  @ApiProperty({
-    example: 15,
-    description: "Shu rangdagi avtomobil soni",
-  })
-  @Column({
-    type: DataType.INTEGER,
-    defaultValue: 1
-  })
-  declare count: number;
 
   @BelongsTo(()=> Car)
   car: Car;

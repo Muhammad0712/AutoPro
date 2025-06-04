@@ -35,7 +35,7 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     description: "Bu yerga avtomobil sotuvchi tashkilot nomi kiritiladi",
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING,
   })
   declare company_name: string;
 
@@ -44,7 +44,7 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     description: "Bu yerga companiya direktori ismi kiritiladi!",
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING,
   })
   declare director_first_name: string;
 
@@ -53,7 +53,7 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     description: "Bu yerga companiya direktori familyasi kiritiladi!",
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING,
   })
   declare director_last_name: string;
 
@@ -72,7 +72,7 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     description: "Bu yerga parol kiritiladi!",
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING,
   })
   declare password: string;
 
@@ -91,7 +91,7 @@ export class Company extends Model<Company, ICompanyCreationAttr> {
     description: "Bu yerga qo'shimcha telefon raqam kiritiladi!",
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING,
     unique: true
   })
   declare additional_phone_number: string;

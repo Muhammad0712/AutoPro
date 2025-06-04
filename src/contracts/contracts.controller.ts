@@ -17,9 +17,6 @@ import { Contract } from "./models/contract.model";
 import { Roles } from "../common/decorators/roles-auth.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { Request } from "express";
-
-@ApiTags("Shartnomalar")
 @Controller("contracts")
 export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
@@ -139,7 +136,7 @@ export class ContractsController {
   })
   @Roles("user")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get()
+  @Get("user/:id")
   findAllUserContracts(@Param("id") id: string) {
     return this.contractsService.findAllUserContracts(+id);
   }
@@ -160,7 +157,7 @@ export class ContractsController {
   })
   @Roles("company")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get(":id")
+  @Get("company/:id")
   findAllCompanyContracts(@Param("id") id: string) {
     return this.contractsService.findAllCompanyContracts(+id);
   }

@@ -54,8 +54,4 @@ export class CreateCarDto {
   @ApiProperty({ example: 3, description: "Kompaniya ID" })
   @IsNotEmpty({ message: "Company ID bo‘sh bo‘lmasligi kerak" })
   company_id: number;
-
-  @ApiProperty({ example: 10, description: "Avtomobillar soni" })
-  @IsNotEmpty({ message: "Count bo‘sh bo‘lmasligi kerak" })
-  count: number;
 }

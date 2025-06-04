@@ -6,12 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  UseGuards,
 } from "@nestjs/common";
 import { PaymentsService } from "./payments.service";
 import { CreatePaymentDto } from "./dto/create-payment.dto";
 import { UpdatePaymentDto } from "./dto/update-payment.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Payment } from "./models/payment.model";
+import { Roles } from "../common/decorators/roles-auth.decorator";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
 
 @ApiTags("To‘lovlar")
 @Controller("payments")
@@ -47,7 +52,7 @@ export class PaymentsController {
   })
   @ApiResponse({
     status: 400,
-    description: "To‘lovlar ro'yxatini chiqarishda xatolik"
+    description: "To‘lovlar ro'yxatini chiqarishda xatolik",
   })
   @Get()
   findAll() {
@@ -105,5 +110,55 @@ export class PaymentsController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.paymentsService.remove(+id);
+  }
+
+  @ApiOperation({
+    summary: "Foydalanuvchilar uchun shaxsiy to'lovlarni chiqarish!",
+    description:
+      "Bu endpoint orqali foydalanuvchilar faqat o'zigagina tegishli bo'lgan to'lovlarni chiqaradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "To'lovlaringiz muvaffaqiyatli chiqarildi!",
+    type: [Payment],
+  })
+  @ApiResponse({
+    status: 400,
+    description: "To'lovlaringizni chiqarishda xatolik",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Sizda hech qanday to'lov mavjud emas",
+  })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get("my-payments/:id")
+  getMyPayments(@Param("id") id: string) {
+    return this.paymentsService.getMyPayments(+id);
+  }
+
+  @ApiOperation({
+    summary: "Companiyalarning o'ziga tegishli to'lovlarni chiqarish!",
+    description:
+      "Bu endpoint orqali companiya xodimlari faqat o'zigagina tegishli bo'lgan to'lovlarni chiqaradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "To'lovlaringiz muvaffaqiyatli chiqarildi!",
+    type: [Payment],
+  })
+  @ApiResponse({
+    status: 400,
+    description: "To'lovlaringizni chiqarishda xatolik",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Sizda hech qanday to'lov mavjud emas",
+  })
+  @Roles("company")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get("company-payments/:id")
+  getCompanyPayments(@Param("id") id: string) {
+    return this.paymentsService.getCompanyPayments(+id);
   }
 }

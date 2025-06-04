@@ -97,4 +97,21 @@ export class AdminsController {
   seeOneSelf(@Param("id") id: string) {
     return this.adminsService.findOne(+id);
   }
+
+  // ___________________-UPDATE-ONE-SELF-____________________
+  @ApiOperation({ summary: "id orqali admin o'z malumotlarini o'zgartiradi" })
+  @ApiResponse({ status: 200, type: UpdateAdminDto })
+  @ApiResponse({
+    status: 400,
+    description: "Admin malumotlarini o'zgartirishda xatolik!",
+  })
+  @ApiResponse({ status: 404, description: "Bunday admin topilmadi!" })
+  @UseGuards(JwtAuthGuard, RolesGuard, JwtSelfGuard)
+  @Patch("my-self/:id")
+  updateOneSelf(
+    @Param("id") id: string,
+    @Body() updateAdminDto: UpdateAdminDto
+  ) {
+    return this.adminsService.update(+id, updateAdminDto);
+  }
 }

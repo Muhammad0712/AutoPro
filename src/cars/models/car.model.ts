@@ -28,7 +28,6 @@ interface ICarCreationAttrs {
   model_id: number;
   brand_id: number;
   company_id: number;
-  count: number;
 }
 
 @Table({ tableName: "cars", timestamps: false })
@@ -104,13 +103,6 @@ export class Car extends Model<Car, ICarCreationAttrs> {
   @ForeignKey(() => Company)
   @Column({ type: DataType.BIGINT })
   declare company_id: number;
-
-  @ApiProperty({
-    example: 10,
-    description: "Ombordagi ushbu modeldagi avtomobillar soni",
-  })
-  @Column({ type: DataType.BIGINT })
-  declare count: number;
 
   @BelongsTo(()=> CarModel)
   carModel: CarModel;
