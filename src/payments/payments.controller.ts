@@ -36,6 +36,8 @@ export class PaymentsController {
     status: 400,
     description: "To‘lov qo‘shishda xatolik",
   })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentsService.create(createPaymentDto);
@@ -54,6 +56,7 @@ export class PaymentsController {
     status: 400,
     description: "To‘lovlar ro'yxatini chiqarishda xatolik",
   })
+  
   @Get()
   findAll() {
     return this.paymentsService.findAll();

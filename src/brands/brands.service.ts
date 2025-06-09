@@ -12,11 +12,11 @@ import { Brand } from "./models/brand.model";
 export class BrandsService {
   constructor(@InjectModel(Brand) private readonly brandModel: typeof Brand) {}
   async create(createBrandDto: CreateBrandDto) {
-    const brand = await this.brandModel.create(createBrandDto);
+    const brand = await this.brandModel.findOne({where: {name: createBrandDto.name}});
     if (brand) {
       throw new ConflictException("Bunday brand tarmoqda mavjud!");
     }
-    return brand;
+    return this.brandModel.create(createBrandDto);
   }
 
   async findAll() {

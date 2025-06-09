@@ -10,8 +10,13 @@ export class PaymentsService {
   constructor(
     @InjectModel(Payment) private readonly paymentModel: typeof Payment
   ) {}
-  create(createPaymentDto: CreatePaymentDto) {
-    this.paymentModel.create(createPaymentDto);
+  async create(createPaymentDto: CreatePaymentDto) {
+    const payment = await this.paymentModel.create(createPaymentDto);
+    const { amount } = createPaymentDto;
+    return {
+      message: "O'tkazma muvaffaqiyatli o'tkazildi",
+      payment,
+    };
   }
 
   async findAll() {

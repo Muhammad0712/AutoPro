@@ -31,7 +31,9 @@ export class CarColoursService {
   }
 
   async findAll() {
-    const records = await this.carColoursModel.findAll();
+    const records = await this.carColoursModel.findAll({
+      include: { all: true },
+    });
     if (!records.length) {
       throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas");
     }
@@ -39,7 +41,9 @@ export class CarColoursService {
   }
 
   async findOne(id: number) {
-    const record = await this.carColoursModel.findByPk(id);
+    const record = await this.carColoursModel.findByPk(id, {
+      include: { all: true },
+    });
     if (!record) {
       throw new NotFoundException("Bu avtomobilni bunday rangi mavjud emas");
     }

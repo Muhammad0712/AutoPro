@@ -21,7 +21,6 @@ export class RolesGuard implements CanActivate {
     }
     const role = req.user.role;
     const permission = requiredRoles.includes(role);
-    console.log(role);
     if (!permission) {
         throw new ForbiddenException("Ruxsat etilmagan foydalanuvchi!");
     }
