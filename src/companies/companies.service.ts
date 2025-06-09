@@ -8,6 +8,7 @@ import { UpdateCompanyDto } from "./dto/update-company.dto";
 import { InjectModel } from "@nestjs/sequelize";
 import { Company } from "./models/company.model";
 import * as bcrypt from "bcrypt";
+import { UpdatePasswordDto } from "../users/dto/update-password.dto";
 
 @Injectable()
 export class CompaniesService {
@@ -15,8 +16,8 @@ export class CompaniesService {
     @InjectModel(Company) private readonly companyModel: typeof Company
   ) {}
   async create(createCompanyDto: CreateCompanyDto) {
-    const user = await this.findByEmail(createCompanyDto.email);
-    if (user) {
+    const company = await this.findByEmail(createCompanyDto.email);
+    if (company) {
       throw new BadRequestException("Bunday foydalanuvchi mavjud!");
     }
     const hashedPassword = await bcrypt.hash(createCompanyDto.password, 7);
@@ -78,5 +79,26 @@ export class CompaniesService {
   async findByEmail(email: string) {
     const company = await this.companyModel.findOne({ where: { email } });
     return company;
+  }
+
+  async updatePassword(id: number, updatedPasswordDto: UpdatePasswordDto) {
+    const company = await this.companyModel.findByPk(id);
+    const { old_password, new_password, confirm_password } = updatedPasswordDto;
+    if (!company) {
+      throw new NotFoundException("Foydalanuvchi topilmadi");
+    }
+    const isValidpassword = await bcrypt.compare(old_password, company.password);
+    if (!isValidpassword) {
+      throw new BadRequestException("Parol xato");
+    }
+    if (new_password !== confirm_password) {
+      throw new BadRequestException("Parollar bir xil emas!");
+    }
+    const password = await bcrypt.hash(new_password, 7);
+    company.password = password;
+    await company.save();
+    return {
+      message: "Password updated succesfully",
+    };
   }
 }

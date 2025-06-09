@@ -17,4 +17,11 @@ export class CreateCarColourDto {
   @IsNotEmpty({ message: "colour_id maydoni bo'sh bo'lmasligi kerak" })
   @IsInt({ message: "colour_id butun son bo‘lishi kerak" })
   colour_id: number;
+
+  @ApiProperty({
+    example: 10,
+    description: "Shu rangli moshinalar soni"
+  })
+  @IsInt({message: "count son bo'lishi kerak"})
+  count: number;
 }

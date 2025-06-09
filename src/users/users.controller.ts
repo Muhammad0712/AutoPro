@@ -17,6 +17,7 @@ import { Roles } from "../common/decorators/roles-auth.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
+import { UpdatePasswordDto } from "./dto/update-password.dto";
 
 @Controller("users")
 export class UsersController {
@@ -61,7 +62,8 @@ export class UsersController {
   // ___________________-FINDONE-USER-___________________
   @ApiOperation({
     summary: "Foydalanuvchini id orqali o'z malumotlarini chiqarish",
-    description: "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
+    description:
+      "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
   })
   @ApiResponse({
     status: 200,
@@ -123,7 +125,8 @@ export class UsersController {
   // ___________________-FINDONE-ONE-SELF-___________________
   @ApiOperation({
     summary: "Foydalanuvchi o'z malumotlarini chiqarishi",
-    description: "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
+    description:
+      "Bu endpoint foydalanuvchi o'z malumotlarini olish uchun ishlatiladi.",
   })
   @ApiResponse({
     status: 200,
@@ -144,7 +147,8 @@ export class UsersController {
   // ___________________-UPDATE-ONE-SELF-___________________
   @ApiOperation({
     summary: "Foydalanuvchi o'z malumotlarini o'zgartirishi",
-    description: "Bu endpoint orqali foydalanuvchi o'z malumotlarini o'zgartirish uchun ishlatiladi.",
+    description:
+      "Bu endpoint orqali foydalanuvchi o'z malumotlarini o'zgartirish uchun ishlatiladi.",
   })
   @ApiResponse({
     status: 200,
@@ -180,5 +184,32 @@ export class UsersController {
   @Delete("my-self/:id")
   deleteOneSelf(@Param("id") id: string) {
     return this.usersService.remove(+id);
+  }
+
+  // ____________________-UPDATE-PASSWORD-____________________
+  @ApiOperation({
+    summary: "Parolni o'zgartirish user uchun",
+    description: "Bu endpoint orqali foydalanuvchi parolini o'zgartiradi!",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Parol muvaffaqiyatli o'zgartirildi!",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Parol xato yoki parollar bir xil emas!",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bunday foydalanuvchi topilmadi!",
+  })
+  @Roles("user")
+  @UseGuards(JwtAuthGuard, RolesGuard, JwtSelfGuard)
+  @Patch("password/:id")
+  async updatePassword(
+    @Param("id") id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto
+  ) {
+    return this.usersService.updatePassword(+id, updatePasswordDto)
   }
 }

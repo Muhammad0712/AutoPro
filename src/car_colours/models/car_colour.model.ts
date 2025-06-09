@@ -41,6 +41,16 @@ export class CarColour extends Model<CarColour, ICarColourCreationAttr> {
   })
   declare colour_id: number;
 
+  @ApiProperty({
+    example: 10,
+    description: "Shu rangli moshinalar soni"
+  })
+  @Column({
+    type: DataType.INTEGER,
+    defaultValue: 1
+  })
+  declare count: number
+
   @BelongsTo(()=> Car)
   car: Car;
 

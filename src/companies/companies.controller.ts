@@ -18,6 +18,7 @@ import { Roles } from "../common/decorators/roles-auth.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
+import { UpdatePasswordDto } from "../users/dto/update-password.dto";
 
 @Controller("companies")
 export class CompaniesController {
@@ -228,4 +229,30 @@ export class CompaniesController {
   deleteOneSelf(@Param("id") id: string) {
     return this.companiesService.remove(+id);
   }
+
+  @ApiOperation({
+      summary: "Parolni o'zgartirish user uchun",
+      description: "Bu endpoint orqali foydalanuvchi parolini o'zgartiradi!",
+    })
+    @ApiResponse({
+      status: 200,
+      description: "Parol muvaffaqiyatli o'zgartirildi!",
+    })
+    @ApiResponse({
+      status: 400,
+      description: "Parol xato yoki parollar bir xil emas!",
+    })
+    @ApiResponse({
+      status: 404,
+      description: "Bunday foydalanuvchi topilmadi!",
+    })
+    @Roles("company")
+    @UseGuards(JwtAuthGuard, RolesGuard, JwtSelfGuard)
+    @Patch("password/:id")
+    async updatePassword(
+      @Param("id") id: string,
+      @Body() updatePasswordDto: UpdatePasswordDto
+    ) {
+      return this.companiesService.updatePassword(+id, updatePasswordDto)
+    }
 }
