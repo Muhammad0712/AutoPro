@@ -39,7 +39,7 @@ export class CreateUserDto {
     description: "Foydalanuvchi telefon raqami",
   })
   @IsPhoneNumber("UZ", {
-    message: "Noto‘g‘ri telefon raqam formati. (+998...)",
+    message: "Noto‘g‘ri! Telefon raqam formati. (+998...)",
   })
   phone_number: string;
 }

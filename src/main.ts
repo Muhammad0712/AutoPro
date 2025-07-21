@@ -19,6 +19,12 @@ async function start() {
     app.setGlobalPrefix("api");
     app.use(cookieParser());
 
+    app.enableCors({
+      origin: "http://localhost:5173",
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      credentials: true,
+    });
+
     const config = new DocumentBuilder()
       .setTitle("AutPro project")
       .setDescription("NestJs Api")

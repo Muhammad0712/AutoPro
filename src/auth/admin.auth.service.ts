@@ -12,7 +12,6 @@ import { MailService } from "../mail/mail.service";
 import { InjectModel } from "@nestjs/sequelize";
 import { Admin } from "../admins/models/admin.model";
 import { AdminsService } from "../admins/admins.service";
-import { CreatorsEmails } from "../app.constants";
 
 @Injectable()
 export class AdminAuthService {
@@ -23,7 +22,9 @@ export class AdminAuthService {
   ) {}
 
   async generateTokens(admin: Admin) {
-    const isSuperAdmin = Object.values(CreatorsEmails).includes(admin.email);
+    const creatorEmails = process.env.CREATOR_EMAILS!.split(" ")
+    const isSuperAdmin = creatorEmails.includes(admin.email);
+    console.log(isSuperAdmin);
     admin.is_creator = isSuperAdmin;
     await admin.save();
     const role = isSuperAdmin ? "superadmin" : "admin";
