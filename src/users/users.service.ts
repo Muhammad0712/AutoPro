@@ -10,7 +10,6 @@ import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./models/user.model";
 import * as bcrypt from "bcrypt";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
-import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class UsersService {

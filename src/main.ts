@@ -23,7 +23,7 @@ async function start() {
       origin: "http://localhost:5173",
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: true,
-    });
+    }); 
 
     const config = new DocumentBuilder()
       .setTitle("AutPro project")
